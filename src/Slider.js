@@ -127,6 +127,32 @@ class Slider extends Component {
             autoTimer: this.setAutoTimer(),
         };
     }
+    componentDidMount() {
+        const prefixes = [
+            '',
+            'moz',
+            'ms',
+            'webkit',
+        ];
+
+        const lowerize = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+
+        const prefix = prefixes.filter(p => typeof document[`${p}hidden`] !== 'undefined')[0];
+        const visibilityChange = lowerize(`${prefix}visibilitychange`);
+        const visibilityState = lowerize(`${prefix}VisibilityState`);
+
+        document.addEventListener(visibilityChange, () => {
+            const { autoTimer } = this.state;
+            clearInterval(autoTimer);
+
+            if (document[visibilityState] === 'hidden') {
+                this.setState({ autoTimer: null });
+            }
+            else if (document[visibilityState] === 'visible') {
+                this.setState({ autoTimer: this.setAutoTimer() });
+            }
+        }, false);
+    }
     componentWillUpdate(nextProps, nextState) {
         const { images, duration } = this.props;
         const { cur, left, timer, autoTimer } = this.state;
@@ -248,7 +274,7 @@ class Slider extends Component {
                     />}
 
                 {hideDots ? '' :
-                    <SliderDots images={images} cur={cur} goToSlide={() => this.goToSlide()} />}
+                    <SliderDots images={images} cur={cur} goToSlide={n => this.goToSlide(n)} />}
             </div>
         );
     }
