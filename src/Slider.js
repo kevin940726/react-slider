@@ -63,6 +63,8 @@ const styles = {
         textAlign: 'center',
         zIndex: '3',
         margin: '0px',
+        cursor: 'pointer',
+        padding: '0px',
     },
     dot: {
         height: '15px',
@@ -95,12 +97,16 @@ const SliderArrows = Radium(({ prevSlide, nextSlide }) => (
             key="leftArrow"
             onClick={prevSlide}
             style={[styles.arrow, styles.leftArrow]}
-        ></div>
+        >
+            <div style={styles.leftArrowAfter}></div>
+        </div>
         <div
             key="rightArrow"
             onClick={nextSlide}
             style={[styles.arrow, styles.rightArrow]}
-        ></div>
+        >
+            <div style={styles.rightArrowAfter}></div>
+        </div>
     </div>
 ));
 
@@ -162,6 +168,7 @@ class Slider extends Component {
         if (cur !== nextState.cur && cur !== -1 && cur !== images.length) {
             clearInterval(timer);
             clearInterval(autoTimer);
+            clearInterval(nextState.autoTimer);
 
             let nextCur = nextState.cur;
 
@@ -209,20 +216,11 @@ class Slider extends Component {
     }
 
     setAutoTimer() {
-        return setInterval(() => {
-            this.nextSlide();
-        }, this.props.interval);
-    }
-    getCircularValue(v) {
-        const len = this.props.images.length;
-        if (v > len - 1) {
-            return v % len;
-        }
-        else if (v < 0) {
-            return this.getCircularValue(len + v);
-        }
-
-        return v;
+        return this.props.manual
+            ? setInterval(() => {
+                this.nextSlide();
+            }, this.props.interval)
+            : null;
     }
     nextSlide() {
         const { cur, timer } = this.state;
@@ -280,8 +278,17 @@ class Slider extends Component {
     }
 }
 
-Slider.PropTypes = {
-    images: PropTypes.array.isRequired,
+Slider.propTypes = {
+    images: PropTypes.arrayOf(PropTypes.string.isRequired).isRequired,
+    interval: PropTypes.number,
+    duration: PropTypes.number,
+    hideArrows: PropTypes.bool,
+    hideDots: PropTypes.bool,
+    manual: PropTypes.bool,
+};
+Slider.defaultProps = {
+    interval: 8000,
+    duration: 300,
 };
 
 export default Radium(Slider);
