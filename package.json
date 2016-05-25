@@ -1,7 +1,7 @@
 {
   "name": "react-slider",
   "version": "0.0.1",
-  "description": "An image banner slider built with React",
+  "description": "Yet another images slider built with React",
   "scripts": {
     "start": "node server.js",
     "lint": "eslint src"
